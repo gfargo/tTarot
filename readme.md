@@ -81,6 +81,12 @@ The core loop: launch → choose spread → shuffle → reveal cards → read in
 - **Reversed cards**: enable/disable reversed cards appearing in readings
 - Accessible from the main menu
 
+#### Daily Card
+- `ttarot --daily` or `ttarot -d` — draws a single card of the day and exits
+- Same card shown all day (cached in `~/.ttarot/daily.json`)
+- Non-interactive output — add to `.bashrc`/`.zshrc` for card on shell open
+- Shows card art, name, interpretation, and keywords
+
 #### Navigation
 - Keyboard-driven throughout: arrow keys, Enter, Escape to go back, q to quit
 - Consistent header bar with current screen title
@@ -119,8 +125,7 @@ src/
 
 ### v3.0 — Nice-to-Haves
 
-- **Daily card** — `ttarot --daily` mode, single card pull
-- **Daily notification** — card of the day on shell open
+- **Daily notification** — card of the day on shell open (auto-trigger)
 - **Custom themes** — deck color overrides via `borderColor`/`artColor`
 - **Spread builder** — define and save custom spread layouts
 - **Export** — export readings as markdown or plain text
