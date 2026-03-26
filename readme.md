@@ -2,134 +2,121 @@
 
 A mystical tarot reading experience for the terminal. Built with [Ink 6](https://github.com/vadimdemedes/ink), React 19, and [ink-playing-cards](https://github.com/gfargo/ink-playing-cards).
 
-## Stack
+## Features
 
-- **Ink 6** — React renderer for the terminal
-- **React 19** — component-based UI
-- **ink-playing-cards** — TarotCard components, 78-card deck, DeckProvider
-- **TypeScript** — type safety with `react-jsx` transform
-- **AVA** — concurrent test runner with `tsx` loader
-- **XO + Prettier** — linting and formatting
+### Interactive Readings
+
+Choose from 4 spread types — Single Card, Three Card (Past/Present/Future), Celtic Cross (10 cards), or Yes/No — then shuffle, reveal cards one at a time, and read their interpretations. Optionally type a question before drawing or hold it in your mind.
+
+Reversed cards appear with ~50% probability (toggleable in Settings) and show distinct reversed interpretations.
+
+### Daily Card
+
+```bash
+ttarot --daily    # or ttarot -d
+```
+
+Draws a single card of the day and exits. The same card is shown all day (cached in `~/.ttarot/daily.json`). Non-interactive output — add it to your `.bashrc` or `.zshrc` for a card on every shell open.
+
+### Tarot Dictionary
+
+Browse all 78 cards (22 Major Arcana + 56 Minor Arcana) in a windowed, scrollable list. Filter by Major Arcana or suit (Wands, Cups, Swords, Pentacles). Each card renders alongside its full upright and reversed meanings. Press `r` to toggle between them.
+
+### Reading Summary
+
+After a reading, browse through each card's position, meaning, and interpretation with arrow keys. Works for all spread sizes including the 10-card Celtic Cross.
 
 ## Getting Started
 
 ```bash
 yarn install
-yarn dev       # watch mode
-yarn start     # run the CLI
-yarn test      # run tests
-yarn typecheck # type-check
-yarn lint      # lint and format
+
+# Interactive mode
+yarn start
+
+# Daily card
+npx tsx src/cli.tsx --daily
+
+# Development
+yarn dev        # watch mode
+yarn test       # run tests
+yarn typecheck  # type-check
+yarn lint       # lint and format
 ```
 
 ## Requirements
 
 - Node.js >= 22
 
----
+## Stack
 
-## Roadmap
+- [Ink 6](https://github.com/vadimdemedes/ink) — React renderer for the terminal
+- [React 19](https://react.dev) — component-based UI
+- [ink-playing-cards](https://github.com/gfargo/ink-playing-cards) — TarotCard components, 78-card deck, DeckProvider
+- TypeScript, AVA, XO + Prettier
 
-### v1.0 — Core Experience
+## Project Structure
 
-The core loop: launch → choose spread → shuffle → reveal cards → read interpretations.
-
-#### Welcome Screen
-- Mystic ASCII art title ("tTarot")
-- Brief intro text, atmospheric purple/gold/cyan palette
-- "Press Enter to begin" prompt
-- Alternate screen mode for a clean full-terminal experience
-
-#### Spread Selection
-- Arrow key navigation to pick a reading type:
-  - **Single Card** — daily pull / quick answer
-  - **Three Card** — Past / Present / Future
-  - **Celtic Cross** — 10-card deep reading
-  - **Yes/No** — single card, binary interpretation
-
-#### Question Input (Optional)
-- Before drawing, user is prompted: type a question or hold it in mind
-- Press Enter to skip or submit
-- Question displayed in the reading summary
-
-#### Shuffle & Draw
-- Animated shuffle sequence using `useDeck().shuffle()`
-- Cards dealt face-down into the spread layout
-- Visual feedback during shuffle (card-flipping animation)
-
-#### Card Reveal
-- Cards revealed one at a time via Enter / arrow keys
-- `TarotCard` component with `faceUp` toggling
-- Reversed cards shown with `reversed` prop (configurable, see Settings)
-
-#### Reading / Interpretation
-- After each card flip, show the card's meaning in a styled panel beside/below the card
-- Positional meaning displayed (e.g., "Position 1: The Past")
-- Upright vs reversed interpretations from built-in data for all 78 cards
-
-#### Summary View
-- Full spread visible with combined reading narrative
-- All cards, positions, and interpretations at a glance
-
-#### Tarot Dictionary / Appendix
-- Browse all 78 cards in a searchable/scrollable list
-- Card rendered on the left, full description in a scrollable panel on the right
-- Filter by Major/Minor Arcana, by suit
-- View upright and reversed meanings for any card
-
-#### Settings
-- **Reversed cards**: enable/disable reversed cards appearing in readings
-- Accessible from the main menu
-
-#### Daily Card
-- `ttarot --daily` or `ttarot -d` — draws a single card of the day and exits
-- Same card shown all day (cached in `~/.ttarot/daily.json`)
-- Non-interactive output — add to `.bashrc`/`.zshrc` for card on shell open
-- Shows card art, name, interpretation, and keywords
-
-#### Navigation
-- Keyboard-driven throughout: arrow keys, Enter, Escape to go back, q to quit
-- Consistent header bar with current screen title
-
-### v1.0 — Technical Architecture
-
-```
+```text
 src/
-├── cli.tsx                — entry point, meow CLI, render with alternateScreen
+├── cli.tsx                — entry point, meow CLI with --daily flag
 ├── app.tsx                — root component, screen router
+├── daily.tsx              — daily card logic (cache, seeded random, static render)
 ├── screens/
 │   ├── welcome.tsx        — title screen
 │   ├── spread-select.tsx  — choose spread type
 │   ├── reading.tsx        — shuffle → draw → reveal → interpret
-│   ├── summary.tsx        — full reading overview
-│   └── dictionary.tsx     — tarot card appendix / browser
+│   ├── summary.tsx        — reading overview with card browser
+│   ├── dictionary.tsx     — tarot card appendix / browser
+│   └── settings.tsx       — toggle reversed cards
 ├── components/
 │   ├── header.tsx         — app header bar
-│   ├── spread-layout.tsx  — positions cards per spread type
+│   ├── viewport.tsx       — fixed-height terminal viewport
 │   ├── card-meaning.tsx   — interpretation panel
 │   └── question-input.tsx — text input for querent's question
 ├── data/
-│   └── interpretations.ts — 78 card meanings (upright + reversed)
-├── hooks/
-│   └── use-reading.ts     — reading state machine
+│   └── interpretations.ts — 78 card meanings (upright + reversed + keywords)
 ├── types.ts               — app types (Spread, Reading, Settings, etc.)
 └── utils/
     └── spreads.ts         — spread definitions (positions, labels, card count)
 ```
 
-### v2.0 — Persistence & History
+## Controls
 
-- **Save readings** — write readings to `~/.ttarot/` as JSON
-- **Reading history** — browse past readings with arrow keys
-- **Journaling** — add personal notes to saved readings
+| Key | Action |
+|---|---|
+| ↑ ↓ | Navigate lists, browse cards |
+| ← → | Switch filters (dictionary) |
+| Enter | Select, reveal card, confirm |
+| Esc | Go back |
+| q | Quit |
+| d | Dictionary (from welcome) |
+| s | Settings (from welcome) |
+| r | Toggle reversed (dictionary) |
+| PgUp/PgDn | Jump through lists |
 
-### v3.0 — Nice-to-Haves
+## Roadmap
 
-- **Daily notification** — card of the day on shell open (auto-trigger)
-- **Custom themes** — deck color overrides via `borderColor`/`artColor`
-- **Spread builder** — define and save custom spread layouts
-- **Export** — export readings as markdown or plain text
+- [x] Interactive readings (Single, Three Card, Celtic Cross, Yes/No)
+- [x] Optional question input
+- [x] Shuffle animation and card-by-card reveal
+- [x] 78-card interpretation database (upright + reversed)
+- [x] Reading summary with card browser
+- [x] Tarot Dictionary with filters and card preview
+- [x] Settings (reversed cards toggle)
+- [x] Daily card of the day (`--daily` flag)
+- [x] Fixed-height viewport with consistent layout
+- [ ] Save readings to `~/.ttarot/` as JSON
+- [ ] Reading history browser
+- [ ] Journaling — personal notes on saved readings
+- [ ] Custom color themes
+- [ ] Spread builder — define custom spread layouts
+- [ ] Export readings as markdown or plain text
+- [ ] Daily card auto-trigger on shell open
 
+## License
+
+MIT
 ---
 
 ## License
